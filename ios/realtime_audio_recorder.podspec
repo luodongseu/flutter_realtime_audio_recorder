@@ -16,6 +16,9 @@ flutter_realtime_audio_recorder
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
 
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '10.0'
+  
+  s.ios.vendored_frameworks = 'Frameworks/lame.framework'
+  s.vendored_frameworks = 'lame.framework'
 end
 
