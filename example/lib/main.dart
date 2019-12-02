@@ -1,8 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'dart:async';
-
 import 'package:flutter/services.dart';
 import 'package:realtime_audio_recorder/realtime_audio_recorder.dart';
 
@@ -65,9 +64,9 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: InkWell(
-            child: Text("btn"),
-            onTap: () {
+          child: FlatButton(
+            child: Text("录音的按钮"),
+            onPressed: () {
               if (recorder.isRecording) {
                 recorder.stop();
               } else {
