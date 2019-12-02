@@ -1,14 +1,16 @@
 package com.luodongseu.realtime_audio_recorder;
 
 /**
- * @author zhaolewei on 2018/7/11.
+ * 录音数据监听器
+ *
+ * @author luodong
  */
 public interface RecordDataListener {
 
     /**
-     * 当前的录音状态发生变化
+     * 录音mp3数据
      *
-     * @param data 当前音频数据
+     * @param data 当前音频数据字节byte[]
      */
     void onData(byte[] data);
 

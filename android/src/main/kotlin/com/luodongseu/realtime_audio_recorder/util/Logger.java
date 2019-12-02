@@ -135,7 +135,7 @@ public class Logger {
     }
 
     /**
-     * Please refer to comment of {@link #cacheLongLog(String, String, Throwable)}
+     * Please refer to comment of
      *
      * @param tag        TAG name.
      * @param logContent Log content.

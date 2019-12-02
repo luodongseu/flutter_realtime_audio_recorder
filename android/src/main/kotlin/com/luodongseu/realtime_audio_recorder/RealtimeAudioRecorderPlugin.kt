@@ -9,21 +9,26 @@ import io.flutter.plugin.common.EventChannel
 
 /**
  * 实时录音的Android插件
+ *
+ * @author luodong
  */
 class RealtimeAudioRecorderPlugin : MethodCallHandler, EventChannel.StreamHandler {
 
-    var dataSink: EventChannel.EventSink? = null
-    var isRecording = false
-    private var recorderManager: RecordManager = RecordManager.getInstance()
+    // 数据的SINK
+    private var dataSink: EventChannel.EventSink? = null
+    // 是否正在录音
+    private var isRecording = false
+    // 录音器
+    private var recorder: Recorder = Recorder.getInstance()
 
     init {
         // 初始化录音
-        recorderManager.init(registrar.activity().application, false)
-        recorderManager.changeRecordDir(registrar.activity().filesDir.absolutePath)
-        recorderManager.setRecordDataListener { data ->
+        recorder.setRecordDataListener { data ->
             // 获取到录音数据 mp3
-            println("data......." + data.size)
-            dataSink?.success(data)
+            if (null != data && data.isNotEmpty()) {
+                println("Send mp3 data(length)...." + data.size)
+                dataSink?.success(data)
+            }
         }
     }
 
@@ -56,19 +61,19 @@ class RealtimeAudioRecorderPlugin : MethodCallHandler, EventChannel.StreamHandle
             call.method == "startRecorder" -> {
                 // 开始录音
                 if (isRecording) {
-                    recorderManager.stop()
+                    recorder.stop()
                 }
                 isRecording = true
-                recorderManager.start()
-                result.success(recorderManager.recordConfig.recordDir)
+                recorder.start()
+                result.success("ok")
             }
             call.method == "stopRecorder" -> {
                 // 结束录音
                 if (isRecording) {
                     isRecording = false
-                    recorderManager.stop()
+                    recorder.stop()
                 }
-                result.success(recorderManager.recordConfig.recordDir)
+                result.success("ok")
             }
             else -> result.notImplemented()
         }
