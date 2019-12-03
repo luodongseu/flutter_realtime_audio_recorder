@@ -26,7 +26,7 @@ class _MyAppState extends State<MyApp> {
 
   void init() async {
     webSocket = await WebSocket.connect(
-        'ws://192.168.1.99:8840/ksb-live/inspection-socket/100');
+        'ws://192.168.1.1:8840/socket');
     webSocket.listen((data) {
       print('server data: $data');
     }, onDone: () {
@@ -65,7 +65,7 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Center(
           child: FlatButton(
-            child: Text("录音的按钮"),
+            child: Text(recorder.isRecording ? "停止" : "开始录音"),
             onPressed: () {
               if (recorder.isRecording) {
                 recorder.stop();
