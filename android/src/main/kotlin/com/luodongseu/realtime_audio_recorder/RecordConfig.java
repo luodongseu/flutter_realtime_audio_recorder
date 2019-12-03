@@ -7,7 +7,9 @@ import java.io.Serializable;
 import java.util.Locale;
 
 /**
- * @author zhaolewei on 2018/7/11.
+ * 录音配置信息
+ *
+ * @author luodong
  */
 public class RecordConfig implements Serializable {
     /**
@@ -25,23 +27,8 @@ public class RecordConfig implements Serializable {
      */
     private int sampleRate = 44100;
 
-    /*
-     * 录音文件存放路径，默认sdcard/Record
-     */
-    private String recordDir = String.format(Locale.getDefault(),
-            "%s/Record/",
-            Environment.getExternalStorageDirectory().getAbsolutePath());
 
     public RecordConfig() {
-    }
-
-
-    public String getRecordDir() {
-        return recordDir;
-    }
-
-    public void setRecordDir(String recordDir) {
-        this.recordDir = recordDir;
     }
 
     /**
