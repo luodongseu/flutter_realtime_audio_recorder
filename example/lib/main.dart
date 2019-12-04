@@ -25,8 +25,13 @@ class _MyAppState extends State<MyApp> {
   }
 
   void init() async {
-    webSocket = await WebSocket.connect(
-        'ws://192.168.1.1:8840/socket');
+    bool hasPermission = await recorder.hasPermission();
+    print(hasPermission);
+    if (!hasPermission) {
+      await recorder.requestPermission();
+    }
+
+    webSocket = await WebSocket.connect('ws://192.168.1.1:8840/socket');
     webSocket.listen((data) {
       print('server data: $data');
     }, onDone: () {
