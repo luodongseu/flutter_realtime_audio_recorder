@@ -1,7 +1,6 @@
 package com.luodongseu.realtime_audio_recorder;
 
 import android.media.AudioFormat;
-import android.os.Environment;
 
 import java.io.Serializable;
 import java.util.Locale;

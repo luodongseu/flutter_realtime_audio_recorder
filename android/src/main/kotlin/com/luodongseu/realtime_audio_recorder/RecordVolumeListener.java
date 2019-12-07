@@ -1,17 +1,17 @@
 package com.luodongseu.realtime_audio_recorder;
 
 /**
- * 录音数据监听器
+ * 录音声音大小监听器
  *
  * @author luodong
  */
-public interface RecordDataListener {
+public interface RecordVolumeListener {
 
     /**
      * 录音mp3数据
      *
-     * @param data 当前音频数据字节byte[]
+     * @param volume 录音大小
      */
-    void onData(byte[] data);
+    void onData(double volume);
 
 }

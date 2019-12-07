@@ -6,15 +6,20 @@ import 'package:flutter/services.dart';
 /// @author luodongseu
 class RealtimeAudioRecorder {
   static const MethodChannel _channel =
-  const MethodChannel('realtime_audio_recorder');
+      const MethodChannel('realtime_audio_recorder');
   static const EventChannel _dataChannel =
-  EventChannel('realtime_audio_recorder.dataChannel');
+      EventChannel('realtime_audio_recorder.dataChannel');
+  static const EventChannel _volumeChannel =
+      EventChannel('realtime_audio_recorder.volumeChannel');
 
   /// 是否正在录音
   bool isRecording = false;
 
   /// 数据流
   Stream<dynamic> _dataStream;
+
+  /// 声音流
+  Stream<dynamic> _volumeStream;
 
   /// 开始录音
   /// 返回：录音文件mp3地址
@@ -40,5 +45,13 @@ class RealtimeAudioRecorder {
       _dataStream = _dataChannel.receiveBroadcastStream();
     }
     return _dataStream;
+  }
+
+  /// 获取声音流
+  Stream<dynamic> get volumeStream {
+    if (_volumeChannel == null) {
+      _volumeStream = _volumeChannel.receiveBroadcastStream();
+    }
+    return _volumeStream;
   }
 }

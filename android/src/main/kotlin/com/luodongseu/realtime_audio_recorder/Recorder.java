@@ -23,8 +23,8 @@ public class Recorder {
     private volatile static Recorder instance;
     private volatile RecordState state = RecordState.IDLE;
     private static final int RECORD_AUDIO_BUFFER_TIMES = 1;
-
     private RecordDataListener recordDataListener;
+    private RecordVolumeListener recordVolumeListener;
     private RecordConfig currentConfig = new RecordConfig();
     private AudioRecordThread audioRecordThread;
     private Mp3EncoderHelper mp3EncoderHelper;
@@ -53,6 +53,15 @@ public class Recorder {
      */
     void setRecordDataListener(RecordDataListener recordDataListener) {
         this.recordDataListener = recordDataListener;
+    }
+
+    /**
+     * 音量监听器
+     *
+     * @param recordVolumeListener RecordVolumeListener
+     */
+    public void setRecordVolumeListener(RecordVolumeListener recordVolumeListener) {
+        this.recordVolumeListener = recordVolumeListener;
     }
 
     /**
@@ -93,18 +102,34 @@ public class Recorder {
      * @param data byte[]
      */
     private void notifyData(final byte[] data) {
-        if (recordDataListener == null) {
+        if (null == recordDataListener) {
             return;
         }
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                if (recordDataListener != null) {
-                    recordDataListener.onData(data);
-                }
+                recordDataListener.onData(data);
             }
         });
     }
+
+    /**
+     * 通知声音变化
+     *
+     * @param v 音量大小
+     */
+    private void notifyVolume(final double v) {
+        if (null == recordVolumeListener) {
+            return;
+        }
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                recordVolumeListener.onData(v);
+            }
+        });
+    }
+
 
     /**
      * 单独的录音线程
@@ -139,8 +164,12 @@ public class Recorder {
                 while (state == RecordState.RECORDING) {
                     int end = audioRecord.read(byteBuffer, 0, byteBuffer.length);
                     if (mp3EncoderHelper != null) {
+                        // 通知转换后的 mp3 数据
                         byte[] encodeData = mp3EncoderHelper.encode(new Mp3EncoderHelper.ChangeBuffer(byteBuffer, end));
                         notifyData(encodeData);
+
+                        // 通知声音大小
+                        notifyVolume(calcVolume(byteBuffer, end));
 
                         // @TODO: 写入到本地文件
                     }
@@ -155,6 +184,25 @@ public class Recorder {
                 Logger.d(TAG, "暂停");
             }
         }
+
+        /**
+         * 计算声音大小
+         *
+         * @param buffer 声音数据
+         * @param length 有效长度
+         * @return double
+         */
+        private double calcVolume(short[] buffer, int length) {
+            if (length <= 0 || null == buffer) {
+                return 0.0;
+            }
+            int v = 0;
+            for (int i = 0; i < buffer.length && i < length; i++) {
+                v += buffer[i] * buffer[i];
+            }
+            return 1.0 * v / length;
+        }
+
     }
 
 
