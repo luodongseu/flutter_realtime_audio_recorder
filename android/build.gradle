@@ -2,22 +2,25 @@ group 'com.luodongseu.realtime_audio_recorder'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.2.71'
     repositories {
-        google()
         jcenter()
+        maven {
+            url "https://maven.google.com"
+        }
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.android.tools.build:gradle:3.1.4'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.51'
     }
 }
 
 rootProject.allprojects {
     repositories {
-        google()
         jcenter()
+        maven {
+            url "https://maven.google.com"
+        }
     }
 }
 
@@ -51,6 +54,6 @@ allprojects {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+//    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 //    implementation 'com.github.zhaolewei:ZlwAudioRecorder:v1.07'
 }
