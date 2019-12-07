@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:realtime_audio_recorder/realtime_audio_recorder.dart';
+import 'package:simple_permissions/simple_permissions.dart';
 
 void main() => runApp(MyApp());
 
@@ -25,13 +26,17 @@ class _MyAppState extends State<MyApp> {
   }
 
   void init() async {
-    bool hasPermission = await recorder.hasPermission();
-    print(hasPermission);
-    if (!hasPermission) {
-      await recorder.requestPermission();
+    PermissionStatus status = await SimplePermissions.getPermissionStatus(Permission.RecordAudio);
+    if (status != PermissionStatus.authorized) {
+      await SimplePermissions.requestPermission(Permission.RecordAudio);
     }
 
-    webSocket = await WebSocket.connect('ws://192.168.1.1:8840/socket');
+    try {
+      webSocket = await WebSocket.connect('ws://192.168.1.1:8840/socket');
+    }catch (e) {
+      print('Cannot connect to server socket!!! $e');
+      return;
+    }
     webSocket.listen((data) {
       print('server data: $data');
     }, onDone: () {
