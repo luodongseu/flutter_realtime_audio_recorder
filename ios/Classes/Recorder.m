@@ -89,7 +89,6 @@ lame_t lame;
 }
 
 -(double)calcVolume:(float*)buffer size:(int)bufferSize {
-    int db = 0;
     int length = bufferSize / 2;
     double sum = 0;
     
@@ -101,7 +100,7 @@ lame_t lame;
         sum += abs(butterByte[i]); //绝对值求和
     }
     sum = sum / length; //求平均值（2个字节表示一个振幅，所以振幅个数为：size/2个）
-    return db;
+    return sum;
 }
 
 - (void)stop{

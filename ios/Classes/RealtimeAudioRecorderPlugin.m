@@ -21,6 +21,7 @@ BOOL isRecording = false;
     if (self) {
         self.recorder = [[Recorder alloc]init];
         self.recorder.dataListener=self;
+        self.recorder.volumeListener=self;
     }
     return self;
 }
@@ -74,6 +75,7 @@ BOOL isRecording = false;
 
 /// 接收到音频数据
 - (void)onData:(unsigned char * _Nullable)data length:(int)length {
+     NSLog(@"data......");
     if(nil != self.dataSinkHandler && nil != self.dataSinkHandler.sink && nil != data) {
         NSData *dataArr = [NSData dataWithBytes:data  length:length];
         self.dataSinkHandler.sink(dataArr);
@@ -82,7 +84,8 @@ BOOL isRecording = false;
 
 /// 声音监听
 - (void)onData:(double)data {
-    if(nil != self.volumeSinkHandler && nil != self.volumeSinkHandler.sink) {\
+    NSLog(@"vooovvov   %f", data);
+    if(nil != self.volumeSinkHandler && nil != self.volumeSinkHandler.sink) {
         self.volumeSinkHandler.sink(@(data));
     }
 }

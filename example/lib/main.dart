@@ -74,7 +74,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Plugin example ap1p'),
         ),
         body: Center(
           child: FlatButton(
