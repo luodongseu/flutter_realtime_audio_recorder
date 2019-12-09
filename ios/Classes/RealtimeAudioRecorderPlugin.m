@@ -47,7 +47,7 @@ BOOL isRecording = false;
                                          eventChannelWithName:@"realtime_audio_recorder.volumeChannel"
                                          binaryMessenger: [registrar messenger]];
     DataHandler *volumeHandler = [[DataHandler alloc]init];
-    [volumeChannel setStreamHandler:dataHandler];
+    [volumeChannel setStreamHandler:volumeHandler];
     instance.volumeSinkHandler = volumeHandler;
 }
 
