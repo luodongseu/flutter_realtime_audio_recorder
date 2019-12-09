@@ -1,8 +1,10 @@
 #import "RealtimeAudioRecorderPlugin.h"
 #import "Recorder.h"
+#import "DataHandler.h"
 
-@interface RealtimeAudioRecorderPlugin()<FlutterStreamHandler,DataListener>
-@property (nonatomic, copy) FlutterEventSink dataSink;
+@interface RealtimeAudioRecorderPlugin()<DataListener,VolumeListener>
+@property (nonatomic, strong) DataHandler* dataSinkHandler;
+@property (nonatomic, strong) DataHandler* volumeSinkHandler;
 @property (nonatomic, strong) Recorder *recorder;
 @property (nonatomic, strong) NSTimer         *timer;
 @property (nonatomic, assign) BOOL         isStopRecord;//结束录音控制
@@ -31,11 +33,21 @@ BOOL isRecording = false;
     RealtimeAudioRecorderPlugin* instance = [[RealtimeAudioRecorderPlugin alloc] init];
     [registrar addMethodCallDelegate:instance channel:channel];
     
-    // 注册eventChannel
+    // 注册dataChannel
     FlutterEventChannel* dataChannel =[FlutterEventChannel
                                        eventChannelWithName:@"realtime_audio_recorder.dataChannel"
                                        binaryMessenger: [registrar messenger]];
-    [dataChannel setStreamHandler:instance];
+    DataHandler *dataHandler = [[DataHandler alloc]init];
+    [dataChannel setStreamHandler:dataHandler];
+    instance.dataSinkHandler = dataHandler;
+    
+    // 注册volumeChannel
+    FlutterEventChannel* volumeChannel =[FlutterEventChannel
+                                         eventChannelWithName:@"realtime_audio_recorder.volumeChannel"
+                                         binaryMessenger: [registrar messenger]];
+    DataHandler *volumeHandler = [[DataHandler alloc]init];
+    [volumeChannel setStreamHandler:dataHandler];
+    instance.volumeSinkHandler = volumeHandler;
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
@@ -60,21 +72,18 @@ BOOL isRecording = false;
     }
 }
 
-- (FlutterError * _Nullable)onCancelWithArguments:(id _Nullable)arguments {
-    self.dataSink = nil;
-    return nil;
-}
-
-- (FlutterError * _Nullable)onListenWithArguments:(id _Nullable)arguments eventSink:(nonnull FlutterEventSink)events {
-    self.dataSink = events;
-    return nil;
-}
-
 /// 接收到音频数据
 - (void)onData:(unsigned char * _Nullable)data length:(int)length {
-    if(nil != self.dataSink && nil != data) {
+    if(nil != self.dataSinkHandler && nil != self.dataSinkHandler.sink && nil != data) {
         NSData *dataArr = [NSData dataWithBytes:data  length:length];
-        self.dataSink(dataArr);
+        self.dataSinkHandler.sink(dataArr);
+    }
+}
+
+/// 声音监听
+- (void)onData:(double)data {
+    if(nil != self.volumeSinkHandler && nil != self.volumeSinkHandler.sink) {\
+        self.volumeSinkHandler.sink(@(data));
     }
 }
 
