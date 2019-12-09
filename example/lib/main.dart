@@ -48,7 +48,9 @@ class _MyAppState extends State<MyApp> {
       print('data: ${List.from(data).length}');
       webSocket.add(List<int>.from(data));
     });
-    // recorder.
+    recorder.volumeStream.listen((volume) {
+      print('vol: $volume');
+    });
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.

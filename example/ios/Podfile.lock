@@ -1,27 +1,27 @@
 PODS:
   - Flutter (1.0.0)
-  - permission_handler (4.0.0):
-    - Flutter
   - realtime_audio_recorder (0.0.1):
+    - Flutter
+  - simple_permissions (0.0.1):
     - Flutter
 
 DEPENDENCIES:
   - Flutter (from `.symlinks/flutter/ios`)
-  - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
   - realtime_audio_recorder (from `.symlinks/plugins/realtime_audio_recorder/ios`)
+  - simple_permissions (from `.symlinks/plugins/simple_permissions/ios`)
 
 EXTERNAL SOURCES:
   Flutter:
     :path: ".symlinks/flutter/ios"
-  permission_handler:
-    :path: ".symlinks/plugins/permission_handler/ios"
   realtime_audio_recorder:
     :path: ".symlinks/plugins/realtime_audio_recorder/ios"
+  simple_permissions:
+    :path: ".symlinks/plugins/simple_permissions/ios"
 
 SPEC CHECKSUMS:
   Flutter: 446b87ace8a3747a167979213b4aef59a0b5e5fa
-  permission_handler: 0fb88b8a3c23e31e5de45b8f1bb8b7de28cf8941
   realtime_audio_recorder: 94451bc750a4348c25a627b8748c19b84513a9e5
+  simple_permissions: 149cd87a11f83c24bf99f6e8a82f9fc8b70be233
 
 PODFILE CHECKSUM: b6a0a141693093b304368d08511b46cf3d1d0ac5
 
