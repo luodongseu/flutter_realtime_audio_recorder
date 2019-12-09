@@ -1,6 +1,7 @@
 #import "Recorder.h"
 #import <AVFoundation/AVFoundation.h>
 #import <lame/lame.h>
+#import <Accelerate/Accelerate.h>
 
 @interface Recorder()
 @property (nonatomic, strong) AVAudioEngine *engine;
@@ -19,7 +20,7 @@ lame_t lame;
 {
     self = [super init];
     if (self) {
-//        file = [[NSMutableData alloc]init];
+        //        file = [[NSMutableData alloc]init];
         [self setAudioSession];
     }
     return self;
@@ -60,7 +61,7 @@ lame_t lame;
     //    lame_set_mode(lame, 3);
     lame_set_VBR(lame, vbr_default/*vbr_off*/);
     lame_init_params(lame);
-   
+    
     // 监听录音数据
     [inputNode installTapOnBus:0 bufferSize:bufferSize format:[inputNode inputFormatForBus:0] block:^(AVAudioPCMBuffer * _Nonnull buffer, AVAudioTime * _Nonnull when) {
         float*  channel1Buffer = buffer.floatChannelData[0];
@@ -70,11 +71,11 @@ lame_t lame;
         if(nil != self.dataListener) {
             [self.dataListener onData:mp3_buffer length:bytesWritten];
         }
-//        [file appendBytes:mp3_buffer length:bytesWritten];
+        //        [file appendBytes:mp3_buffer length:bytesWritten];
         
         // 声音大小
         if(nil != self.volumeListener) {
-            [self.volumeListener onData:[self calcVolume:channel1Buffer size:bufferSize]];
+            [self.volumeListener onData:[self calcVolume:channel1Buffer size:bufferSize frameLength:frameLength]];
         }
     }];
     
@@ -88,19 +89,13 @@ lame_t lame;
     }
 }
 
--(double)calcVolume:(float*)buffer size:(int)bufferSize {
-    int length = bufferSize / 2;
-    double sum = 0;
-    
-    short butterByte[length];
-    memcpy(butterByte, buffer, bufferSize);
-    
-    for(int i = 0; i < length; i += 2)
-    {
-        sum += abs(butterByte[i]); //绝对值求和
-    }
-    sum = sum / length; //求平均值（2个字节表示一个振幅，所以振幅个数为：size/2个）
-    return sum;
+// 返回0-1.0的数据
+-(int)calcVolume:(float*)buffer size:(int)bufferSize frameLength:(int)frameLength {
+    Float32 avgValue = 0.0;
+    // 计算平方平均值
+    vDSP_meamgv(buffer, 1, &avgValue, bufferSize);
+    Float32 v = (20 * log10f(avgValue)) + 100;
+    return MAX(MIN((int)v, 100), 0);
 }
 
 - (void)stop{
@@ -113,12 +108,12 @@ lame_t lame;
     [self.engine.inputNode removeTapOnBus:0];
     [self.engine stop];
     self.engine = nil;
-
+    
     // 存储mp3到文件中
-//    NSFileManager *fm = [NSFileManager defaultManager];
-//    NSURL *doc = [fm URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nil];
-//    NSURL *outurl = [doc URLByAppendingPathComponent:@"record.mp3" isDirectory:NO];
-//    [file writeToURL:outurl atomically:true];
+    //    NSFileManager *fm = [NSFileManager defaultManager];
+    //    NSURL *doc = [fm URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nil];
+    //    NSURL *outurl = [doc URLByAppendingPathComponent:@"record.mp3" isDirectory:NO];
+    //    [file writeToURL:outurl atomically:true];
 }
 
 -(BOOL)isRecording{

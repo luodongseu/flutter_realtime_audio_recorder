@@ -83,8 +83,7 @@ BOOL isRecording = false;
 }
 
 /// 声音监听
-- (void)onData:(double)data {
-    NSLog(@"vooovvov   %f", data);
+- (void)onData:(int)data {
     if(nil != self.volumeSinkHandler && nil != self.volumeSinkHandler.sink) {
         self.volumeSinkHandler.sink(@(data));
     }

@@ -13,7 +13,7 @@
 @protocol VolumeListener <NSObject>
 
 // 接收到数据
-- (void)onData:(double)data;
+- (void)onData:(int)data;
 
 @end
 
@@ -37,7 +37,7 @@
 - (void)stop;
 
 /**
- 计算音量
+ 计算音量 0-100
  */
-- (double)calcVolume:(float*)buffer size:(int)bufferSize;
+- (int)calcVolume:(float*)buffer size:(int)bufferSize frameLength:(int)frameLength;
 @end
