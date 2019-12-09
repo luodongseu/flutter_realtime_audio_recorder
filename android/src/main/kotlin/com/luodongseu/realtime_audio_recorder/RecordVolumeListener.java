@@ -10,8 +10,8 @@ public interface RecordVolumeListener {
     /**
      * 录音mp3数据
      *
-     * @param volume 录音大小
+     * @param volume 录音大小 分贝
      */
-    void onData(double volume);
+    void onData(int volume);
 
 }
