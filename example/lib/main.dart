@@ -17,6 +17,8 @@ class _MyAppState extends State<MyApp> {
   RealtimeAudioRecorder recorder = RealtimeAudioRecorder();
 
   WebSocket webSocket;
+  Timer timer;
+  int volume = 0;
 
   @override
   void initState() {
@@ -26,14 +28,17 @@ class _MyAppState extends State<MyApp> {
   }
 
   void init() async {
-    PermissionStatus status = await SimplePermissions.getPermissionStatus(Permission.RecordAudio);
+    PermissionStatus status =
+        await SimplePermissions.getPermissionStatus(Permission.RecordAudio);
     if (status != PermissionStatus.authorized) {
       await SimplePermissions.requestPermission(Permission.RecordAudio);
     }
 
     try {
-      webSocket = await WebSocket.connect('ws://192.168.1.1:8840/socket');
-    }catch (e) {
+      webSocket = await WebSocket.connect(
+          'ws://192.168.1.99:8840/socket',
+          headers: {"inspectionNo": "IN1911291429466187084"});
+    } catch (e) {
       print('Cannot connect to server socket!!! $e');
       return;
     }
@@ -44,13 +49,28 @@ class _MyAppState extends State<MyApp> {
     }, onError: (e) {
       print('server error: $e');
     });
-    recorder.dataStream.listen((data) {
+    recorder.dataStream?.listen((data) {
       print('data: ${List.from(data).length}');
       webSocket.add(List<int>.from(data));
     });
-    recorder.volumeStream.listen((volume) {
-      print('vol: $volume');
+    recorder.volumeStream?.listen((v) {
+      print('vol: $v');
+      if (v > volume) {
+        volume = v;
+      }
     });
+    timer = Timer.periodic(Duration(seconds: 1), (t) {
+      if (recorder.isRecording) {
+        webSocket.add('V:$volume');
+        volume = 0;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    timer?.cancel();
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -77,15 +97,26 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example ap1p'),
         ),
         body: Center(
-          child: FlatButton(
-            child: Text(recorder.isRecording ? "停止" : "开始录音"),
-            onPressed: () {
-              if (recorder.isRecording) {
-                recorder.stop();
-              } else {
-                recorder.start();
-              }
-            },
+          child: Column(
+            children: <Widget>[
+              FlatButton(
+                child: Text(recorder.isRecording ? "停止" : "开始录音"),
+                onPressed: () {
+                  if (recorder.isRecording) {
+                    recorder.stop();
+                  } else {
+                    recorder.start();
+                  }
+                  setState(() {});
+                },
+              ),
+              FlatButton(
+                child: Text('发送事件'),
+                onPressed: () {
+                  webSocket?.add("E:2-3");
+                },
+              )
+            ],
           ),
         ),
       ),
