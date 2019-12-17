@@ -167,12 +167,14 @@ public class Recorder {
                     if (mp3EncoderHelper != null) {
                         // 通知转换后的 mp3 数据
                         byte[] encodeData = mp3EncoderHelper.encode(new Mp3EncoderHelper.ChangeBuffer(byteBuffer, end));
-                        notifyData(encodeData);
+                        if(state == RecordState.RECORDING) {
+                            notifyData(encodeData);
 
-                        // 通知声音大小
-                        notifyVolume(calcVolume(byteBuffer, byteBuffer.length));
+                            // 通知声音大小
+                            notifyVolume(calcVolume(byteBuffer, byteBuffer.length));
 
-                        // @TODO: 写入到本地文件
+                            // @TODO: 写入到本地文件
+                        }
                     }
                 }
                 audioRecord.stop();

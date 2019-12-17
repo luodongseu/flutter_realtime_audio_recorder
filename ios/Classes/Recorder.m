@@ -53,8 +53,8 @@ lame_t lame;
     
     // 加载lame
     lame = lame_init();
-    //    lame_set_num_channels(lame,1);//通道
-    lame_set_in_samplerate(lame, [inputNode inputFormatForBus:0].sampleRate / 2);//采样率
+    lame_set_num_channels(lame, 1);//通道
+    lame_set_in_samplerate(lame, [inputNode inputFormatForBus:0].sampleRate);//采样率
     //    lame_set_brate(lame, 16);//比特率
     lame_set_quality(lame, 2);//音质
     lame_set_out_samplerate(lame, 0);
