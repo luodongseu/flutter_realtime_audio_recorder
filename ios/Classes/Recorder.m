@@ -33,10 +33,18 @@ lame_t lame;
  *  设置音频会话
  */
 -(void)setAudioSession{
-    AVAudioSession *audioSession=[AVAudioSession sharedInstance];
-    //设置为播放和录音状态，以便可以在录制完之后播放录音
-    [audioSession setCategory:AVAudioSessionCategoryRecord error:nil];
-    [audioSession setActive:YES error:nil];
+    dispatch_queue_t mainQ = dispatch_get_main_queue();
+    dispatch_async(mainQ, ^{
+        AVAudioSession *audioSession=[AVAudioSession sharedInstance];
+        //设置为播放和录音状态，以便可以在录制完之后播放录音
+        NSError *error;
+        [audioSession setCategory:AVAudioSessionCategoryRecord error:&error];
+        if(error != noErr) {
+            NSLog(@"audioSession setCategory error %@", error.description);
+        }
+        [audioSession setActive:YES error:nil];
+        if(error != noErr) {NSLog(@"audioSession setActive error %@", error.description);}
+    });
 }
 
 -(void)prepareToRecord{
@@ -102,12 +110,13 @@ lame_t lame;
     if (![self isRecording]) return;
     NSLog(@"stop recording....");
     
-    if(nil != lame) {
-        lame_close(lame);
-    }
     [self.engine.inputNode removeTapOnBus:0];
     [self.engine stop];
     self.engine = nil;
+    
+    if(nil != lame) {
+        lame_close(lame);
+    }
     
     // 存储mp3到文件中
     //    NSFileManager *fm = [NSFileManager defaultManager];
