@@ -10,6 +10,7 @@ import com.luodongseu.realtime_audio_recorder.util.FileUtils;
 import com.luodongseu.realtime_audio_recorder.util.Logger;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -118,7 +119,7 @@ public class Recorder {
      *
      * @param v 音量大小
      */
-    private void notifyVolume(final double v) {
+    private void notifyVolume(final int v) {
         if (null == recordVolumeListener) {
             return;
         }
@@ -166,12 +167,14 @@ public class Recorder {
                     if (mp3EncoderHelper != null) {
                         // 通知转换后的 mp3 数据
                         byte[] encodeData = mp3EncoderHelper.encode(new Mp3EncoderHelper.ChangeBuffer(byteBuffer, end));
-                        notifyData(encodeData);
+                        if(state == RecordState.RECORDING) {
+                            notifyData(encodeData);
 
-                        // 通知声音大小
-                        notifyVolume(calcVolume(byteBuffer, end));
+                            // 通知声音大小
+                            notifyVolume(calcVolume(byteBuffer, byteBuffer.length));
 
-                        // @TODO: 写入到本地文件
+                            // @TODO: 写入到本地文件
+                        }
                     }
                 }
                 audioRecord.stop();
@@ -190,17 +193,18 @@ public class Recorder {
          *
          * @param buffer 声音数据
          * @param length 有效长度
-         * @return double
+         * @return double 0-100
          */
-        private double calcVolume(short[] buffer, int length) {
+        private int calcVolume(short[] buffer, int length) {
             if (length <= 0 || null == buffer) {
-                return 0.0;
+                return 0;
             }
-            int v = 0;
+            long v = 0;
             for (int i = 0; i < buffer.length && i < length; i++) {
                 v += buffer[i] * buffer[i];
             }
-            return 1.0 * v / length;
+            int vol = Double.valueOf(10 * Math.log10(1.0 * v / length)).intValue();
+            return Math.max(Math.min(vol, 100), 0);
         }
 
     }

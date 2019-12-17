@@ -47,7 +47,7 @@ BOOL isRecording = false;
                                          eventChannelWithName:@"realtime_audio_recorder.volumeChannel"
                                          binaryMessenger: [registrar messenger]];
     DataHandler *volumeHandler = [[DataHandler alloc]init];
-    [volumeChannel setStreamHandler:dataHandler];
+    [volumeChannel setStreamHandler:volumeHandler];
     instance.volumeSinkHandler = volumeHandler;
 }
 
@@ -78,14 +78,18 @@ BOOL isRecording = false;
      NSLog(@"data......");
     if(nil != self.dataSinkHandler && nil != self.dataSinkHandler.sink && nil != data) {
         NSData *dataArr = [NSData dataWithBytes:data  length:length];
-        self.dataSinkHandler.sink(dataArr);
+        if(isRecording) {
+            self.dataSinkHandler.sink(dataArr);
+        }
     }
 }
 
 /// 声音监听
 - (void)onData:(int)data {
     if(nil != self.volumeSinkHandler && nil != self.volumeSinkHandler.sink) {
-        self.volumeSinkHandler.sink(@(data));
+        if(isRecording) {
+            self.volumeSinkHandler.sink(@(data));
+        }
     }
 }
 

@@ -49,7 +49,7 @@ class RealtimeAudioRecorder {
 
   /// 获取声音流
   Stream<dynamic> get volumeStream {
-    if (_volumeChannel == null) {
+    if (_volumeStream == null) {
       _volumeStream = _volumeChannel.receiveBroadcastStream();
     }
     return _volumeStream;
