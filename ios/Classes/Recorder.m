@@ -24,11 +24,6 @@ lame_t lame;
     self = [super init];
     if (self) {
         file = [[NSMutableData alloc]init];
-        
-        dispatch_queue_t mainQ = dispatch_get_main_queue();
-        dispatch_async(mainQ, ^{
-            [self initAudioSession];
-        });
     }
     return self;
 }
@@ -55,6 +50,8 @@ lame_t lame;
 - (void)start{
     if ([self isRecording]) return;
     NSLog(@"Start to record....");
+
+    [self initAudioSession];
     
     AVAudioFrameCount bufferSize = 4096;
     self.engine = [[AVAudioEngine alloc]init];
