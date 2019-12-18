@@ -12,7 +12,10 @@
 
 // 存储mp3的字节
 unsigned char mp3_buffer[4096];
-//NSMutableData* file;
+
+// 存储的文件
+NSMutableData* file;
+
 // mp3库
 lame_t lame;
 
@@ -20,8 +23,12 @@ lame_t lame;
 {
     self = [super init];
     if (self) {
-        //        file = [[NSMutableData alloc]init];
-        [self setAudioSession];
+        file = [[NSMutableData alloc]init];
+        
+        dispatch_queue_t mainQ = dispatch_get_main_queue();
+        dispatch_async(mainQ, ^{
+            [self initAudioSession];
+        });
     }
     return self;
 }
@@ -32,23 +39,17 @@ lame_t lame;
 /**
  *  设置音频会话
  */
--(void)setAudioSession{
-    dispatch_queue_t mainQ = dispatch_get_main_queue();
-    dispatch_async(mainQ, ^{
-        AVAudioSession *audioSession=[AVAudioSession sharedInstance];
-        //设置为播放和录音状态，以便可以在录制完之后播放录音
-        NSError *error;
-        [audioSession setCategory:AVAudioSessionCategoryRecord error:&error];
-        if(error != noErr) {
-            NSLog(@"audioSession setCategory error %@", error.description);
-        }
-        [audioSession setActive:YES error:nil];
-        if(error != noErr) {NSLog(@"audioSession setActive error %@", error.description);}
-    });
-}
-
--(void)prepareToRecord{
-    [self setAudioSession];
+-(void)initAudioSession{
+    NSLog(@"Initialize audio session...");
+    AVAudioSession *audioSession=[AVAudioSession sharedInstance];
+    //设置为播放和录音状态，以便可以在录制完之后播放录音
+    NSError *error;
+    [audioSession setCategory:AVAudioSessionCategoryRecord error:&error];
+    if(error != noErr) {
+        NSLog(@"AudioSession setCategory error %@", error.description);
+    }
+    [audioSession setActive:YES error:&error];
+    if(error != noErr) {NSLog(@"AudioSession setActive error %@", error.description);}
 }
 
 - (void)start{
@@ -62,8 +63,8 @@ lame_t lame;
     // 加载lame
     lame = lame_init();
     lame_set_num_channels(lame, 1);//通道
-    lame_set_in_samplerate(lame, [inputNode inputFormatForBus:0].sampleRate);//采样率
-    //    lame_set_brate(lame, 16);//比特率
+    lame_set_in_samplerate(lame, [inputNode inputFormatForBus:0].sampleRate / 2);//采样率
+    lame_set_brate(lame, 96);//比特率
     lame_set_quality(lame, 2);//音质
     lame_set_out_samplerate(lame, 0);
     //    lame_set_mode(lame, 3);
@@ -79,7 +80,7 @@ lame_t lame;
         if(nil != self.dataListener) {
             [self.dataListener onData:mp3_buffer length:bytesWritten];
         }
-        //        [file appendBytes:mp3_buffer length:bytesWritten];
+        [file appendBytes:mp3_buffer length:bytesWritten];
         
         // 声音大小
         if(nil != self.volumeListener) {
@@ -93,7 +94,7 @@ lame_t lame;
     NSError *error;
     [self.engine startAndReturnError:&error];
     if(error != noErr) {
-        NSLog(@"start error: %@", [error description]);
+        NSLog(@"Audio engine start error: %@", [error description]);
     }
 }
 
@@ -108,21 +109,21 @@ lame_t lame;
 
 - (void)stop{
     if (![self isRecording]) return;
-    NSLog(@"stop recording....");
+    NSLog(@"Stop recording....");
     
     [self.engine.inputNode removeTapOnBus:0];
     [self.engine stop];
     self.engine = nil;
     
     if(nil != lame) {
-        lame_close(lame);
+       lame_close(lame);
     }
     
     // 存储mp3到文件中
-    //    NSFileManager *fm = [NSFileManager defaultManager];
-    //    NSURL *doc = [fm URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nil];
-    //    NSURL *outurl = [doc URLByAppendingPathComponent:@"record.mp3" isDirectory:NO];
-    //    [file writeToURL:outurl atomically:true];
+    NSFileManager *fm = [NSFileManager defaultManager];
+    NSURL *doc = [fm URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nil];
+    NSURL *outurl = [doc URLByAppendingPathComponent:@"last_record.mp3" isDirectory:NO];
+    [file writeToURL:outurl atomically:true];
 }
 
 -(BOOL)isRecording{
