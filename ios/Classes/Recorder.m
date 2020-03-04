@@ -51,12 +51,16 @@ lame_t lame;
     if ([self isRecording]) return;
     NSLog(@"Start to record....");
 
-    [self initAudioSession];
-    
     AVAudioFrameCount bufferSize = 4096;
     self.engine = [[AVAudioEngine alloc]init];
     AVAudioInputNode* inputNode = self.engine.inputNode;
-    
+
+    // fix: com.apple.coreaudio.avfaudio: required condition is false: format.sampleRate == hwFormat.sampleRate
+    AudioOutputUnitStop((self.engine.inputNode.audioUnit));
+    AudioUnitUninitialize((self.engine.inputNode.audioUnit));
+
+    [self initAudioSession];
+
     // 加载lame
     lame = lame_init();
     lame_set_num_channels(lame, 1);//通道
