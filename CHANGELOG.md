@@ -1,3 +1,4 @@
-## 0.0.1
+## 0.0.11
 
-* TODO: Describe initial release.
+* fix bug: AVAudioEngine crash - required condition is false: hwFormat
+* update pubspec.yaml
