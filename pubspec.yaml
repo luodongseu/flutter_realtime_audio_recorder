@@ -1,6 +1,6 @@
 name: realtime_audio_recorder
 description: flutter_realtime_audio_recorder
-version: 0.0.11
+version: 0.0.12
 homepage: https://github.com/luodongseu/flutter_realtime_audio_recorder
 
 environment:

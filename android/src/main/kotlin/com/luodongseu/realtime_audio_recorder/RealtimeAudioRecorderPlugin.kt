@@ -16,13 +16,13 @@ import io.flutter.plugin.common.EventChannel.StreamHandler
 class RealtimeAudioRecorderPlugin : MethodCallHandler {
 
     // 数据的SINK
-    private var dataSink: EventChannel.EventSink? = null
+    public var dataSink: EventChannel.EventSink? = null
     // 音量的SINK
-    private var volumeSink: EventChannel.EventSink? = null
+    public var volumeSink: EventChannel.EventSink? = null
     // 是否正在录音
-    private var isRecording = false
+    public var isRecording = false
     // 录音器
-    private var recorder: Recorder = Recorder.getInstance()
+    public var recorder: Recorder = Recorder.getInstance()
 
     init {
         // 初始化录音
